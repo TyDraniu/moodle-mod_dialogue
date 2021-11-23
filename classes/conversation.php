@@ -158,7 +158,7 @@ class conversation extends message {
             throw new \moodle_exception('cannotclosedraftconversation', 'dialogue');
         }
         // Permission check.
-        $canclose = (($this->_authorid == $USER->id) or has_capability('mod/dialogue:closeany', $context));
+        $canclose = (($this->_authorid == $USER->id) or ($this->is_participant()) or has_capability('mod/dialogue:closeany', $context));
         if (!$canclose) {
             throw new \moodle_exception('nopermissiontoclose', 'dialogue');
         }

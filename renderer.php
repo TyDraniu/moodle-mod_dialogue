@@ -89,6 +89,7 @@ class mod_dialogue_renderer extends plugin_renderer_base {
 
         if ($conversation->state == \mod_dialogue\dialogue::STATE_OPEN) {
             $canclose = ((has_capability('mod/dialogue:close', $context) and $USER->id == $conversation->author->id) or
+                        (has_capability('mod/dialogue:close', $context) and $conversation->is_participant()) or
                           has_capability('mod/dialogue:closeany', $context));
 
             if ($canclose) {
