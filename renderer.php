@@ -326,8 +326,13 @@ class mod_dialogue_renderer extends plugin_renderer_base {
         $html .= html_writer::div($avatar, 'conversation-object pull-left');
 
         $html .= html_writer::start_div('conversation-body');
+        try {
+            $datestrings = (object) dialogue_get_humanfriendly_dates($reply->timemodified);
+        }
+        catch (Error $ex) {
+            return $ex->getMessage();
+        }
 
-        $datestrings = (object) dialogue_get_humanfriendly_dates($reply->timemodified);
         $datestrings->fullname = fullname($reply->author);
         if ($reply->timemodified >= $today) {
             $repliedbyheader = get_string('repliedbytoday', 'dialogue', $datestrings);

@@ -21,6 +21,9 @@
  * @copyright 2013 Troy Williams
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+global $CFG, $DB, $PAGE, $OUTPUT, $USER;
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot . '/mod/dialogue/lib.php');
 require_once($CFG->dirroot . '/mod/dialogue/locallib.php');
@@ -35,7 +38,7 @@ $cm = get_coursemodule_from_id('dialogue', $id, 0, false, MUST_EXIST);
 
 $activityrecord = $DB->get_record('dialogue', ['id' => $cm->instance], '*', MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $activityrecord->course], '*', MUST_EXIST);
-$context = \context_module::instance($cm->id, MUST_EXIST);
+$context = context_module::instance($cm->id, MUST_EXIST);
 
 require_login($course, false, $cm);
 
@@ -55,8 +58,8 @@ $PAGE->set_url($pageurl);
 $PAGE->set_title(format_string($activityrecord->name));
 $PAGE->set_heading(format_string($course->fullname));
 
-$dialogue = new \mod_dialogue\dialogue($cm, $course, $activityrecord);
-$conversation = new \mod_dialogue\conversation($dialogue, $conversationid);
+$dialogue = new mod_dialogue\dialogue($cm, $course, $activityrecord);
+$conversation = new mod_dialogue\conversation($dialogue, $conversationid);
 
 if ($action == 'create' or $action == 'edit') {
     require_capability('mod/dialogue:open', $context);
@@ -114,7 +117,7 @@ if ($action == 'close') {
             'context' => $context,
             'objectid' => $conversation->conversationid
         );
-        $event = \mod_dialogue\event\conversation_closed::create($eventparams);
+        $event = mod_dialogue\event\conversation_closed::create($eventparams);
         $event->trigger();
         redirect($returnurl, get_string('conversationclosed', 'dialogue',
                                         $conversation->subject));

@@ -227,8 +227,7 @@ class mod_dialogue_reply_form extends mod_dialogue_message_form {
      * @return array
      */
     public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-        return $errors;
+        return parent::validation($data, $files);
     }
 }
 
@@ -236,6 +235,9 @@ class mod_dialogue_reply_form extends mod_dialogue_message_form {
  * Class mod_dialogue_conversation_form
  */
 class mod_dialogue_conversation_form extends mod_dialogue_message_form {
+
+
+
     /**
      * Definition
      * @throws coding_exception
@@ -267,7 +269,9 @@ class mod_dialogue_conversation_form extends mod_dialogue_message_form {
                 return $OUTPUT->render_from_template('mod_dialogue/form-user-selector-suggestion', $useroptiondata);
             }
         ];
-        $mform->addElement('autocomplete', 'useridsselected', get_string('users'), [], $options);
+
+        //TODO Zmiana wyboru użytkowników z listy rozwijanej na użytkowników z has_capability('mod/dialogue:receive', $context) w kontekście kursu.
+         $mform->addElement('autocomplete', 'useridsselected', get_string('users', 'dialogue'), [], $options);
 
         // Bulk open rule section.
         if (has_capability('mod/dialogue:bulkopenrulecreate', $context)) {
@@ -306,6 +310,7 @@ class mod_dialogue_conversation_form extends mod_dialogue_message_form {
 
         parent::definition();
     }
+
 
     /**
      * Validation

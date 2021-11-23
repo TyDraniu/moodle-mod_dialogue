@@ -16,6 +16,10 @@
 
 namespace mod_dialogue;
 
+use context_course;
+use Exception;
+use moodle_exception;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../../../lib/filelib.php');
@@ -82,6 +86,7 @@ class conversation extends message {
         $participant = dialogue_get_user_details($dialogue, $userid);
         return $this->_participants[$userid] = $participant;
     }
+
 
     /**
      * Clear participants.
@@ -269,6 +274,12 @@ class conversation extends message {
 
         $params = array('conversationid' => $this->_conversationid);
         $records = $DB->get_records('dialogue_participants', $params);
+
+        if (empty($records)) {
+            $this->adduservaluetest();
+        }
+
+
         foreach ($records as $record) {
             // Key up on userid and fetch brief details from cache as value (cut down user record).
             $this->_participants[$record->userid] = dialogue_get_user_details($dialogue, $record->userid);
@@ -639,6 +650,36 @@ class conversation extends message {
         $this->load_participants();
     }
 
+    public function adduservaluetest()
+    {
+        global $COURSE;
+        try {
+
+            try {
+                $context = context_course::instance($COURSE->id);
+                $users = get_enrolled_users($context, 'mod/dialogue:receive', 0, 'u.*', null, 0, 0, true);
+
+                foreach($users as $user) {
+                    $key = $user->id;
+
+                    if (has_capability('mod/dialogue:receive', $context, $user)) {
+                        $this->add_participant($key);
+                    }
+                }
+            }
+            catch (Exception $ex)
+            {
+                $users = array();
+            }
+
+
+        }
+        catch(Exception $ex) {
+            return null;
+        }
+
+    }
+
     /**
      * Send
      * @return bool
@@ -655,6 +696,8 @@ class conversation extends message {
             empty($this->_subject) or empty($this->_body));
 
         if ($incomplete) {
+
+            // $this->add_participant();
             throw new \moodle_exception("incompleteconversation", 'mod_dialogue');
         }
 
